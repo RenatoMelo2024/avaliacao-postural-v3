@@ -1,0 +1,33 @@
+# Ignorar arquivos de cache e dependências
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-arg.txt
+pip_install.log
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+.mypy_cache/
+.gitkeep
+
+# Ignorar o banco de dados e arquivos de upload
+*.db
+uploads/
+
+# Ignorar arquivos de configuração de IDEs
+.idea/
+.vscode/
+
+# Ignorar arquivos temporários
+*~
+*.bak
+*.swp
