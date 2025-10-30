@@ -61,13 +61,15 @@ def analyze_posture():
                 # Analisar postura
                 analysis_result = posture_analyzer.analyze_posture(image)
         
-        # Geração do áudio do exercício
-        if 'risk_factors' in analysis_result['metrics']:
-            audio_path = generate_and_save_exercise_audio(analysis_result['metrics']['risk_factors'], current_user_id)
-            analysis_result['exercise_audio_path'] = audio_path
-        else:
-            analysis_result['exercise_audio_path'] = None
-                
+                # Geração do áudio do exercício
+                if 'risk_factors' in analysis_result['metrics']:
+                    audio_path = generate_and_save_exercise_audio(
+                        analysis_result['metrics']['risk_factors'], current_user_id
+                    )
+                    analysis_result['exercise_audio_path'] = audio_path
+                else:
+                    analysis_result['exercise_audio_path'] = None
+
                 # Remover arquivo temporário
                 os.remove(filepath)
                 
@@ -78,7 +80,9 @@ def analyze_posture():
             
             # Geração do áudio do exercício
             if 'risk_factors' in analysis_result['metrics']:
-                audio_path = generate_and_save_exercise_audio(analysis_result['metrics']['risk_factors'], current_user_id)
+                audio_path = generate_and_save_exercise_audio(
+                    analysis_result['metrics']['risk_factors'], current_user_id
+                )
                 analysis_result['exercise_audio_path'] = audio_path
             else:
                 analysis_result['exercise_audio_path'] = None
@@ -128,6 +132,7 @@ def analyze_posture():
     except Exception as e:
         return jsonify({'error': f'Erro interno do servidor: {str(e)}'}), 500
 
+
 @posture_bp.route('/history', methods=['GET'])
 @jwt_required()
 def get_posture_history():
@@ -171,6 +176,7 @@ def get_posture_history():
         
     except Exception as e:
         return jsonify({'error': f'Erro interno do servidor: {str(e)}'}), 500
+
 
 @posture_bp.route('/details/<int:avaliacao_id>', methods=['GET'])
 @jwt_required()
@@ -232,6 +238,7 @@ def get_posture_details(avaliacao_id):
         
     except Exception as e:
         return jsonify({'error': f'Erro interno do servidor: {str(e)}'}), 500
+
 
 @posture_bp.route('/compare', methods=['POST'])
 @jwt_required()
@@ -324,4 +331,3 @@ def compare_postures():
         
     except Exception as e:
         return jsonify({'error': f'Erro interno do servidor: {str(e)}'}), 500
-
