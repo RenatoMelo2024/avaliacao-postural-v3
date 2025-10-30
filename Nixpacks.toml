@@ -1,0 +1,8 @@
+[phases.setup]
+apt_packages = ["python3-pip"]
+
+[start]
+cmd = "gunicorn --chdir backend/src main:app"
+
+[variables]
+PYTHON_VERSION = "3.11.8"
