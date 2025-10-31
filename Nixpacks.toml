@@ -1,5 +1,5 @@
 [phases.setup]
-apt_packages = ["python3-pip", "libgl1-mesa-glx", "libsm6", "libxrender1"]
+apt_packages = ["python3-pip", "libgl1-mesa-glx", "libsm6", "libxrender1", "libfontconfig1", "libice6", "libxext6"]
 
 [start]
 cmd = "gunicorn --chdir backend/src main:app"
