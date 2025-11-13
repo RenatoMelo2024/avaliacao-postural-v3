@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory
+from dotenv import load_dotenv
 from flask_cors import CORS
 from src.models.user import db
 from src.routes.user import user_bp
@@ -13,9 +14,13 @@ from src.routes.avaliacoes import avaliacoes_bp
 from src.routes.escolas import escolas_bp
 from src.routes.sessoes_rv import sessoes_rv_bp
 from src.routes.posture_analysis import posture_bp
+from src.routes.auth import init_jwt
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 
 # Habilitar CORS para todas as rotas
 CORS(app)
@@ -33,6 +38,7 @@ app.register_blueprint(posture_bp, url_prefix='/api/posture')
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+init_jwt(app)
 
 # Criar diretório de uploads
 uploads_dir = os.path.join(os.path.dirname(__file__), '..', 'uploads')

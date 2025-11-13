@@ -1,40 +1,29 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from src.models.user import db, User
-import jwt
-from datetime import datetime, timedelta
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager
 from functools import wraps
 
 auth_bp = Blueprint('auth', __name__)
 
-# Chave secreta para JWT (em produção, usar variável de ambiente)
-JWT_SECRET = 'sua_chave_secreta_jwt'
+# Inicializar JWTManager no main.py e usar aqui
+# A chave secreta é configurada no main.py através do app.config['JWT_SECRET_KEY']
+
+def init_jwt(app):
+    JWTManager(app)
+
+# Decorador personalizado para obter o usuário atual
+def get_current_user_from_jwt():
+    user_id = get_jwt_identity()
+    return User.query.get(user_id)
 
 def token_required(f):
+    @jwt_required()
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        
-        if not token:
-            return jsonify({'message': 'Token é obrigatório!'}), 401
-        
-        try:
-            # Remove 'Bearer ' do token
-            if token.startswith('Bearer '):
-                token = token[7:]
-            
-            data = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
-            current_user = User.query.get(data['user_id'])
-            
-            if not current_user:
-                return jsonify({'message': 'Token inválido!'}), 401
-                
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Token expirado!'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Token inválido!'}), 401
-        
+        current_user = get_current_user_from_jwt()
+        if current_user is None:
+            return jsonify({'message': 'Token inválido ou usuário não encontrado!'}), 401
         return f(current_user, *args, **kwargs)
-    
     return decorated
 
 @auth_bp.route('/register', methods=['POST'])
@@ -87,14 +76,11 @@ def login():
             return jsonify({'message': 'Usuário inativo!'}), 401
         
         # Gerar token JWT
-        token = jwt.encode({
-            'user_id': usuario.id,
-            'exp': datetime.utcnow() + timedelta(hours=24)
-        }, JWT_SECRET, algorithm='HS256')
+        access_token = create_access_token(identity=usuario.id)
         
         return jsonify({
             'message': 'Login realizado com sucesso!',
-            'token': token,
+            'token': access_token,
             'usuario': usuario.to_dict()
         }), 200
         
