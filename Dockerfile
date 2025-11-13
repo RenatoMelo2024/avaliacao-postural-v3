@@ -2,9 +2,9 @@
 FROM python:3.11-slim
 
 # Instala as dependências do sistema necessárias para o OpenCV/MediaPipe
-# O pacote libgl1-mesa-glx fornece o libGL.so.1, resolvendo o erro de importação.
+# O pacote libgl1 fornece o libGL.so.1, resolvendo o erro de importação.
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Define o diretório de trabalho no contêiner
