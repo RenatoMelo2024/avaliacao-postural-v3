@@ -1,0 +1,25 @@
+# Use a imagem base oficial do Python
+FROM python:3.11-slim
+
+# Instala as dependências do sistema necessárias para o OpenCV
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    && rm -rf /var/lib/apt/lists/*
+
+# Define o diretório de trabalho no contêiner
+WORKDIR /app
+
+# Copia os arquivos de dependências do Python
+COPY backend/requirements.txt .
+
+# Instala as dependências do Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia o restante do código da sua aplicação
+COPY . .
+
+# Expõe a porta que sua aplicação usa (ajuste se for diferente)
+EXPOSE 5000
+
+# Comando para iniciar a aplicação (ajuste o caminho do main:app se necessário)
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "backend.src.main:app"]
