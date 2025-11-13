@@ -11,13 +11,13 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copia os arquivos de dependências do Python
-COPY avaliacao-postural-v3/requirements.txt .
+COPY requirements.txt .
 
 # Instala as dependências do Python
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código da sua aplicação
-COPY avaliacao-postural-v3/ .
+COPY . .
 
 # Expõe a porta que sua aplicação usa (5000 é o padrão para Flask/Gunicorn)
 EXPOSE 5000
