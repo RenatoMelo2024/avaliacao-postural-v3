@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copia os arquivos de dependências do Python
-COPY avaliacao-postural-v3/requirements.txt .
+COPY requirements.txt .
 
 # Instala as dependências do Python
 RUN pip install --no-cache-dir -r requirements.txt
