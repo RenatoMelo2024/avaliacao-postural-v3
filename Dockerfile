@@ -2,13 +2,13 @@
 FROM python:3.11-slim
 
 # Instala as dependências do sistema necessárias para o OpenCV/MediaPipe
-# O pacote libgl1 libsm6 libxext6 fornece o libGL.so.1, resolvendo o erro de importação.
+# O pacote libgl1 libsm6 libxext6 libpq-dev build-essential fornece o libGL.so.1, resolvendo o erro de importação.
 RUN apt-get update && apt-get install -y \
-    libgl1 libsm6 libxext6 \
+    libgl1 libsm6 libxext6 libpq-dev build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Define o diretório de trabalho no contêiner
-WORKDIR /app
+WORKDIR /app\n\n# Adiciona o diretório raiz do projeto ao PYTHONPATH\nENV PYTHONPATH=/app
 
 # Copia os arquivos de dependências do Python
 COPY requirements.txt .
