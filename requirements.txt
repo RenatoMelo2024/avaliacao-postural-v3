@@ -23,5 +23,4 @@ plotly
 pandas
 Pillow
 requests
-\npsycopg2-binary
 npsycopg2-binary
