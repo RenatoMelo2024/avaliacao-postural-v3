@@ -2,6 +2,7 @@ import os
 from openai import OpenAI
 from typing import List, Dict, Optional
 import logging
+	from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -98,5 +99,4 @@ def generate_and_save_exercise_audio(risk_factors: List[Dict], user_id: str) -> 
     else:
         return None
 
-# Importar datetime para uso na função generate_and_save_exercise_audio
-from datetime import datetime
+

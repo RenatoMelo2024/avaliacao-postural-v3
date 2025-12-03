@@ -9,9 +9,12 @@ class User(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=False)
-    tipo_usuario = db.Column(db.String(50), nullable=False)  # admin, profissional_saude, gestor_educacional, estudante
+    tipo_usuario = db.Column(db.String(50), nullable=False)  # admin, profissional_saude, gestor_educacional, estudante, comunidade, profissional_educacao_fisica
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     ativo = db.Column(db.Boolean, default=True)
+	    pontuacao_total = db.Column(db.Integer, default=0)
+	    nivel = db.Column(db.Integer, default=1)
+	    ultima_atividade = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<User {self.nome}>'
@@ -29,7 +32,10 @@ class User(db.Model):
             'email': self.email,
             'tipo_usuario': self.tipo_usuario,
             'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None,
-            'ativo': self.ativo
+            'ativo': self.ativo,
+	            'pontuacao_total': self.pontuacao_total,
+	            'nivel': self.nivel,
+	            'ultima_atividade': self.ultima_atividade.isoformat() if self.ultima_atividade else None
         }
 
 class Escola(db.Model):
@@ -76,8 +82,44 @@ class Estudante(db.Model):
             'responsavel_telefone': self.responsavel_telefone,
             'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None
         }
-
-class AvaliacaoPostural(db.Model):
+	
+	class Comunidade(db.Model):
+	    id = db.Column(db.Integer, primary_key=True)
+	    id_usuario = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+	    data_nascimento = db.Column(db.Date)
+	    genero = db.Column(db.String(20))
+	    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+	
+	    usuario = db.relationship('User', backref=db.backref('comunidade', uselist=False))
+	
+	    def to_dict(self):
+	        return {
+	            'id': self.id,
+	            'id_usuario': self.id_usuario,
+	            'data_nascimento': self.data_nascimento.isoformat() if self.data_nascimento else None,
+	            'genero': self.genero,
+	            'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None
+	        }
+	
+	class ProfissionalEducacaoFisica(db.Model):
+	    id = db.Column(db.Integer, primary_key=True)
+	    id_usuario = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+	    cref = db.Column(db.String(50), unique=True) # Conselho Regional de Educação Física
+	    especializacao = db.Column(db.String(100))
+	    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+	
+	    usuario = db.relationship('User', backref=db.backref('profissional_educacao_fisica', uselist=False))
+	
+	    def to_dict(self):
+	        return {
+	            'id': self.id,
+	            'id_usuario': self.id_usuario,
+	            'cref': self.cref,
+	            'especializacao': self.especializacao,
+	            'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None
+	        }
+	
+	class AvaliacaoPostural(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_estudante = db.Column(db.Integer, db.ForeignKey('estudante.id'), nullable=False)
     data_avaliacao = db.Column(db.DateTime, default=datetime.utcnow)
@@ -127,5 +169,40 @@ class SessaoRV(db.Model):
             'tipo_sessao': self.tipo_sessao,
             'duracao_minutos': self.duracao_minutos,
             'progresso_json': self.progresso_json,
-            'pontuacao': self.pontuacao
-        }
+	            'pontuacao': self.pontuacao
+	        }
+	
+	class Conquista(db.Model):
+	    id = db.Column(db.Integer, primary_key=True)
+	    nome = db.Column(db.String(100), nullable=False, unique=True)
+	    descricao = db.Column(db.Text)
+	    pontos_recompensa = db.Column(db.Integer, default=0)
+	    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+	
+	    def to_dict(self):
+	        return {
+	            'id': self.id,
+	            'nome': self.nome,
+	            'descricao': self.descricao,
+	            'pontos_recompensa': self.pontos_recompensa,
+	            'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None
+	        }
+	
+	class UserConquista(db.Model):
+	    id = db.Column(db.Integer, primary_key=True)
+	    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+	    conquista_id = db.Column(db.Integer, db.ForeignKey('conquista.id'), nullable=False)
+	    data_conquista = db.Column(db.DateTime, default=datetime.utcnow)
+	
+	    user = db.relationship('User', backref=db.backref('conquistas', lazy=True))
+	    conquista = db.relationship('Conquista', backref=db.backref('usuarios', lazy=True))
+	
+	    __table_args__ = (db.UniqueConstraint('user_id', 'conquista_id', name='_user_conquista_uc'),)
+	
+	    def to_dict(self):
+	        return {
+	            'id': self.id,
+	            'user_id': self.user_id,
+	            'conquista_id': self.conquista_id,
+	            'data_conquista': self.data_conquista.isoformat() if self.data_conquista else None
+	        }

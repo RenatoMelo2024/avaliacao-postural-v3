@@ -198,7 +198,7 @@ def upload_imagem(current_user):
         import os
         from werkzeug.utils import secure_filename
         
-        upload_folder = '/home/ubuntu/postural_assessment_api/uploads'
+        upload_folder = os.path.join(os.path.dirname(__file__), '..', '..', 'uploads', 'posture_images')
         os.makedirs(upload_folder, exist_ok=True)
         
         filename = secure_filename(arquivo.filename)
@@ -209,7 +209,7 @@ def upload_imagem(current_user):
         arquivo.save(filepath)
         
         # Retornar URL da imagem
-        image_url = f'/uploads/{filename}'
+        image_url = f'/uploads/posture_images/{filename}'
         
         return jsonify({
             'message': 'Imagem enviada com sucesso!',
